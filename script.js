@@ -539,60 +539,66 @@ document.addEventListener("DOMContentLoaded", () => {
        FETCH NEW ARRIVALS
     ===================================================== */
 
-    async function loadNewArrivals() {
-        const grid = document.getElementById("new-arrivals-grid");
+    // --- Supabase Client Initialization ---
+    const SUPABASE_URL = 'https://lucdgfxiowqpprspnssj.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1Y2RnZnhpb3dxcHByc3Buc3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0NTE1MjksImV4cCI6MjEwMjAyNzUyOX0._pBradRaLmfAmTz9BERgkE5Fs564ENaqCXyrZuABAXQ';
+    let supabase;
+    try {
+        supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } catch (e) {
+        console.error("Supabase client not available. Make sure supabase-js is loaded.", e);
+    }
 
-        // Only run this logic if we are on the new arrivals page
-        if (!grid) {
+    async function loadNewArrivals() {
+        const container = document.getElementById("new-arrivals-container");
+
+        if (!container || !supabase) {
             return;
         }
 
         try {
-            // IMPORTANT: Replace this placeholder with the actual API link
-            // This should point to the JSON file containing your product data.
-            const apiEndpoint = 'https://folasade.pages.com/products.json';
+            const { data: newArrivals, error } = await supabase
+                .from('products')
+                .select('*')
+                .eq('isNewArrival', true)
+                .order('created_at', { ascending: false });
 
-            const response = await fetch(apiEndpoint);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            if (error) {
+                throw error;
             }
-            const products = await response.json();
-
-            const newArrivals = products.filter(product => product.isNewArrival);
 
             if (newArrivals.length === 0) {
-                grid.innerHTML = "<p>No new arrivals at the moment. Please check back soon!</p>";
+                container.innerHTML = "<p>No new arrivals at the moment. Please check back soon!</p>";
                 return;
             }
 
             const productCardsHTML = newArrivals.map(product => {
-                // Note: The product.imageSrc should be updated in products.json
-                return `
+                return /*html*/`
                     <article class="product-card" data-category="${product.category}">
-                        <div class="product-image" style="background-image: url('${product.imageSrc}'); background-size: cover; background-position: center;">
-                            <span class="product-tag">${product.tag}</span>
+                        <div class="product-image">
+                            <img src="${product.imageSrc}" alt="Image of ${product.name}">
+                            ${product.tag ? `<span class="product-tag">${product.tag}</span>` : ''}
                         </div>
                         <div class="product-info">
                             <small>${product.category.toUpperCase()}</small>
                             <h3>${product.name}</h3>
-                            <p>View Details →</p>
+                            <p>Enquire →</p>
                         </div>
                     </article>
                 `;
             }).join('');
 
-            grid.innerHTML = productCardsHTML;
+            container.innerHTML = productCardsHTML;
 
             // Re-attach event listeners to the newly created cards
-            const newCards = grid.querySelectorAll('.product-card');
+            const newCards = container.querySelectorAll('.product-card');
             newCards.forEach(card => {
                 card.addEventListener("click", () => {
                     const productNameElement = card.querySelector("h3");
                     if (productNameElement) {
                         const name = productNameElement.textContent.trim();
                         const whatsappNumber = "2348038184891";
-                        const message = `Hello, I'm interested in the ${name}.`;
+                        const message = `Hello, I'm interested in the new arrival: ${name}.`;
                         const encodedMessage = encodeURIComponent(message);
                         const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
                         window.open(whatsappURL, '_blank');
@@ -604,7 +610,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
             console.error("Could not fetch or load new arrivals:", error);
-            grid.innerHTML = "<p>Sorry, we couldn't load new arrivals at this time.</p>";
+            container.innerHTML = "<p>Sorry, we couldn't load new arrivals at this time.</p>";
         }
     }
 
