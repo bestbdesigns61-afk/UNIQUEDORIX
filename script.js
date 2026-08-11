@@ -679,7 +679,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (form && formResult) {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
-            const formData = new FormData(form);
+            const formData = new FormData(form); // FormData is still great for collecting fields
             const object = Object.fromEntries(formData);
             const json = JSON.stringify(object);
             
