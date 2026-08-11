@@ -544,7 +544,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1Y2RnZnhpb3dxcHByc3Buc3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0NTE1MjksImV4cCI6MjEwMjAyNzUyOX0._pBradRaLmfAmTz9BERgkE5Fs564ENaqCXyrZuABAXQ';
     let supabase;
     try {
-        supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     } catch (e) {
         console.error("Supabase client not available. Make sure supabase-js is loaded.", e);
     }
