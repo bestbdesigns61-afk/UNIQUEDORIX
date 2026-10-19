@@ -53,6 +53,7 @@
             <a href="shop.html">Shop</a>
             <a href="collections.html">Collections</a>
             <a href="new-arrivals.html">New Arrivals</a>
+            <a href="cart.html">Cart (<span data-cart-count>0</span>)</a>
             <a href="lookbook.html">Lookbook</a>
             <a href="about.html">About Us</a>
             <a href="contact.html">Contact</a>
@@ -71,6 +72,7 @@
     <div class="mobile-menu" id="mobileMenu">
         <nav class="mobile-links" aria-label="Mobile navigation">
             <a href="index.html" class="mobile-link">Home</a>
+            <a href="cart.html" class="mobile-link">Cart (<span data-cart-count>0</span>)</a>
             <div class="mobile-category" data-menu="shop" role="button" tabindex="0">
                 <span>Shop</span>
                 <span class="menu-symbol">+</span>
@@ -125,6 +127,7 @@
                         Ventures.
                     </p>
                 </div>
+                <p id="cart-feedback" class="cart-feedback" aria-live="polite"></p>
                 <div class="product-grid" id="new-arrivals-container">
                     <p>Loading new arrivals...</p>
                 </div>
@@ -186,6 +189,7 @@
          JAVASCRIPT
     ========================================== -->
     <script src="script.js"></script>
+    <script src="cart.js"></script>
 
     <!-- Back to Top Button -->
     <button class="back-to-top" id="backToTopBtn" title="Go to top">↑</button>

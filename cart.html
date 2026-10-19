@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b0b0b">
+    <meta name="description" content="Review your Unique Dorrix Ventures cart and request delivery details.">
+    <title>Your Cart | Unique Dorrix Ventures</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="preloader" id="preloader">
+        <img src="udv.jpg" alt="Unique Dorrix Ventures Logo" class="preloader-logo">
+    </div>
+
+    <header class="navbar" id="navbar">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+
+        <a href="index.html" class="logo">
+            <img src="udv.jpg" alt="Unique Dorrix Ventures Logo" class="logo-mark">
+            <div>
+                <span>UNIQUE DORRIX VENTURES</span>
+                <span class="logo-motto">OUR INSPIRATION, YOUR LUXURY</span>
+            </div>
+        </a>
+
+        <nav class="nav-links" aria-label="Main navigation">
+            <a href="index.html">Home</a>
+            <a href="shop.html">Shop</a>
+            <a href="collections.html">Collections</a>
+            <a href="new-arrivals.html">New Arrivals</a>
+            <a href="cart.html" aria-current="page">Cart (<span data-cart-count>0</span>)</a>
+            <a href="lookbook.html">Lookbook</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+
+        <div class="nav-actions">
+            <a href="new-arrivals.html" class="enquire-btn">Continue Shopping</a>
+            <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">☰</button>
+        </div>
+    </header>
+
+    <div class="mobile-menu" id="mobileMenu">
+        <nav class="mobile-links" aria-label="Mobile navigation">
+            <a href="index.html" class="mobile-link">Home</a>
+            <a href="new-arrivals.html" class="mobile-link">New Arrivals</a>
+            <a href="cart.html" class="mobile-link" aria-current="page">Cart (<span data-cart-count>0</span>)</a>
+            <a href="shop.html" class="mobile-link">Shop</a>
+            <a href="collections.html" class="mobile-link">Collections</a>
+            <a href="lookbook.html" class="mobile-link">Lookbook</a>
+            <a href="about.html" class="mobile-link">About Us</a>
+            <a href="contact.html" class="mobile-link">Contact</a>
+        </nav>
+        <div class="mobile-socials">
+            <a href="https://www.instagram.com/unique_dorrixventures/" aria-label="Instagram">Instagram</a>
+            <a href="https://www.tiktok.com/@unidove_13" aria-label="TikTok">TikTok</a>
+            <a href="https://wa.me/2348038184891?text=Hello,%20I'm%20interested%20in%20your%20products." aria-label="WhatsApp">WhatsApp</a>
+        </div>
+        <a href="new-arrivals.html" class="mobile-enquire" id="mobileEnquire">CONTINUE SHOPPING</a>
+    </div>
+
+    <main>
+        <section class="cart-page">
+            <div class="section-container">
+                <div class="section-heading">
+                    <div>
+                        <div class="eyebrow">Your Selection</div>
+                        <h1>Your<br>Cart.</h1>
+                    </div>
+                    <p>Review your new arrivals and send us your order. Our team will confirm delivery charges before payment.</p>
+                </div>
+
+                <p id="cart-feedback" class="cart-feedback" aria-live="polite"></p>
+
+                <div id="empty-cart" class="empty-cart" hidden>
+                    <h2>Your cart is empty.</h2>
+                    <p>Explore the latest arrivals and add the pieces you love.</p>
+                    <a href="new-arrivals.html" class="primary-btn">Explore New Arrivals</a>
+                </div>
+
+                <div id="checkout-section" class="cart-layout" hidden>
+                    <div class="cart-list-panel">
+                        <div id="cart-items" class="cart-items"></div>
+                        <div class="cart-summary">
+                            <span>Items subtotal</span>
+                            <strong id="cart-subtotal">₦0</strong>
+                            <p>Delivery fee is confirmed by our team and is not included above.</p>
+                        </div>
+                    </div>
+
+                    <div class="checkout-panel">
+                        <h2>Delivery details</h2>
+                        <p class="checkout-note">No payment is taken now. We’ll confirm availability and the delivery fee, then send your Paystack payment link by email and WhatsApp. Once sent, payment is due within 48 hours. After that, the order request expires, its reserved stock is released, and you’ll need to submit a new request subject to availability.</p>
+                        <form id="checkout-form" class="checkout-form">
+                            <label for="customer-name">Full name</label>
+                            <input id="customer-name" name="customer_name" type="text" autocomplete="name" maxlength="120" required>
+
+                            <label for="customer-email">Email</label>
+                            <input id="customer-email" name="email" type="email" autocomplete="email" maxlength="254" required>
+
+                            <label for="customer-phone">Phone / WhatsApp number</label>
+                            <input id="customer-phone" name="phone" type="tel" autocomplete="tel" maxlength="32" required>
+
+                            <label for="customer-address">Delivery address</label>
+                            <textarea id="customer-address" name="address" autocomplete="street-address" maxlength="500" required></textarea>
+
+                            <div class="checkout-location">
+                                <div>
+                                    <label for="customer-city">City / town</label>
+                                    <input id="customer-city" name="city" type="text" autocomplete="address-level2" maxlength="100" required>
+                                </div>
+                                <div>
+                                    <label for="customer-state">State</label>
+                                    <input id="customer-state" name="state" type="text" autocomplete="address-level1" maxlength="100" required>
+                                </div>
+                            </div>
+
+                            <button id="order-submit" class="primary-btn checkout-submit" type="submit">Request Order &amp; Delivery Quote</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="order-confirmation" class="order-confirmation" hidden>
+                    <h2>Order request received.</h2>
+                    <p>Your reference is <strong id="order-reference"></strong>. The item subtotal confirmed by Supabase is <strong id="order-subtotal"></strong>. Our team will confirm availability and delivery charges, then contact you by email and WhatsApp with the Paystack payment link. Once that link is sent, payment is due within 48 hours; after expiry, the order request closes and reserved stock is released.</p>
+                    <a id="order-whatsapp-link" class="secondary-btn" href="https://wa.me/2348038184891" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>
+                    <a href="new-arrivals.html" class="primary-btn">Continue Shopping</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="index.html" class="logo">
+                    <img src="udv.jpg" alt="Unique Dorrix Ventures Logo" class="logo-mark">
+                    <div>
+                        <span>UNIQUE DORRIX VENTURES</span>
+                        <span class="logo-motto">OUR INSPIRATION, YOUR LUXURY</span>
+                    </div>
+                </a>
+                <p>Discover clothing, shoes, bags and accessories selected for your unique style.</p>
+            </div>
+            <div class="footer-column">
+                <h4>Explore</h4>
+                <a href="index.html">Home</a>
+                <a href="shop.html">Shop</a>
+                <a href="new-arrivals.html">New Arrivals</a>
+                <a href="cart.html">Cart</a>
+            </div>
+            <div class="footer-column">
+                <h4>Discover</h4>
+                <a href="lookbook.html">Lookbook</a>
+                <a href="about.html">About Us</a>
+                <a href="contact.html">Contact</a>
+            </div>
+            <div class="footer-column">
+                <h4>Social</h4>
+                <a href="https://www.instagram.com/unique_dorrixventures/">Instagram</a>
+                <a href="https://www.tiktok.com/@unidove_13">TikTok</a>
+                <a href="https://wa.me/2348038184891?text=Hello,%20I'm%20interested%20in%20your%20products.">WhatsApp</a>
+            </div>
+        </div>
+        <div class="copyright">
+            <span>© 2026 Unique Dorrix Ventures. All rights reserved.</span>
+            <span>OUR INSPIRATION, YOUR LUXURY</span>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="cart.js"></script>
+    <button class="back-to-top" id="backToTopBtn" title="Go to top">↑</button>
+</body>
+</html>

@@ -542,17 +542,27 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- Supabase Client Initialization ---
     const SUPABASE_URL = 'https://lucdgfxiowqpprspnssj.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1Y2RnZnhpb3dxcHByc3Buc3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0NTE1MjksImV4cCI6MjEwMjAyNzUyOX0._pBradRaLmfAmTz9BERgkE5Fs564ENaqCXyrZuABAXQ';
-    let supabase;
+    let supabase = null;
     try {
+        if (!window.supabase || SUPABASE_ANON_KEY === '******') {
+            throw new Error("Configure the Supabase anon key before loading arrivals or submitting orders.");
+        }
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.storeSupabase = supabase;
     } catch (e) {
+        window.storeSupabase = null;
         console.error("Supabase client not available. Make sure supabase-js is loaded.", e);
     }
 
     async function loadNewArrivals() {
         const container = document.getElementById("new-arrivals-container");
 
-        if (!container || !supabase) {
+        if (!container) {
+            return;
+        }
+
+        if (!supabase) {
+            container.textContent = "New arrivals are unavailable because the Supabase connection is not configured.";
             return;
         }
 
@@ -567,50 +577,94 @@ document.addEventListener("DOMContentLoaded", () => {
                 throw error;
             }
 
-            if (newArrivals.length === 0) {
-                container.innerHTML = "<p>No new arrivals at the moment. Please check back soon!</p>";
+            if (!newArrivals || newArrivals.length === 0) {
+                container.textContent = "No new arrivals at the moment. Please check back soon!";
                 return;
             }
 
-            const productCardsHTML = newArrivals.map(product => {
-                return /*html*/`
-                    <article class="product-card" data-category="${product.category}">
-                        <div class="product-image">
-                            <img src="${product.imageSrc}" alt="Image of ${product.name}">
-                            ${product.tag ? `<span class="product-tag">${product.tag}</span>` : ''}
-                        </div>
-                        <div class="product-info">
-                            <small>${product.category.toUpperCase()}</small>
-                            <h3>${product.name}</h3>
-                            <p>Enquire →</p>
-                        </div>
-                    </article>
-                `;
-            }).join('');
+            container.replaceChildren();
 
-            container.innerHTML = productCardsHTML;
+            newArrivals.forEach(product => {
+                const card = document.createElement("article");
+                card.className = "product-card";
+                card.dataset.category = product.category || "";
 
-            // Re-attach event listeners to the newly created cards
-            const newCards = container.querySelectorAll('.product-card');
-            newCards.forEach(card => {
-                card.addEventListener("click", () => {
-                    const productNameElement = card.querySelector("h3");
-                    if (productNameElement) {
-                        const name = productNameElement.textContent.trim();
-                        const whatsappNumber = "2348038184891";
-                        const message = `Hello, I'm interested in the new arrival: ${name}.`;
-                        const encodedMessage = encodeURIComponent(message);
-                        const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-                        window.open(whatsappURL, '_blank');
-                        console.log(`Visitor interested in: ${name}`);
-                    }
-                });
+                const image = document.createElement("div");
+                image.className = "product-image";
+
+                const productImage = document.createElement("img");
+                productImage.src = product.imageSrc || "udv.jpg";
+                productImage.alt = product.name ? `Image of ${product.name}` : "New arrival";
+                image.appendChild(productImage);
+
+                if (product.tag) {
+                    const tag = document.createElement("span");
+                    tag.className = "product-tag";
+                    tag.textContent = product.tag;
+                    image.appendChild(tag);
+                }
+
+                const info = document.createElement("div");
+                info.className = "product-info";
+
+                const category = document.createElement("small");
+                category.textContent = (product.category || "NEW ARRIVAL").toUpperCase();
+
+                const name = document.createElement("h3");
+                name.textContent = product.name || "New arrival";
+
+                const size = document.createElement("p");
+                size.className = "product-size";
+                size.textContent = product.size ? `Size: ${product.size}` : "";
+
+                const price = document.createElement("p");
+                const priceValue = Number(product.price);
+                const stockValue = Number(product.stock);
+                const hasStock = product.stock !== null &&
+                    product.stock !== undefined &&
+                    product.stock !== "" &&
+                    Number.isInteger(stockValue);
+                price.className = "product-price";
+                price.textContent = Number.isFinite(priceValue) && priceValue > 0
+                    ? `₦${priceValue.toLocaleString("en-NG")}`
+                    : "Price not set";
+
+                const addButton = document.createElement("button");
+                addButton.type = "button";
+                addButton.className = "add-to-cart-btn";
+                addButton.textContent = "Add to Cart";
+                addButton.dataset.productId = String(product.id ?? "");
+                addButton.dataset.productName = product.name || "New arrival";
+                addButton.dataset.productImage = product.imageSrc || "";
+                addButton.dataset.productCategory = product.category || "";
+                addButton.dataset.productSize = product.size || "";
+                addButton.dataset.productPrice = Number.isFinite(priceValue) ? String(priceValue) : "";
+                addButton.dataset.productStock = hasStock ? String(stockValue) : "";
+                addButton.disabled = !product.id ||
+                    !Number.isFinite(priceValue) ||
+                    priceValue <= 0 ||
+                    !hasStock ||
+                    stockValue <= 0;
+
+                if (!Number.isFinite(priceValue) || priceValue <= 0 || !hasStock) {
+                    addButton.title = "Set a price and stock quantity in the product dashboard before selling.";
+                    addButton.textContent = "Set Price & Stock";
+                } else if (stockValue <= 0) {
+                    addButton.textContent = "Out of Stock";
+                }
+
+                info.append(category, name);
+                if (product.size) {
+                    info.appendChild(size);
+                }
+                info.append(price, addButton);
+                card.append(image, info);
+                container.appendChild(card);
             });
-
 
         } catch (error) {
             console.error("Could not fetch or load new arrivals:", error);
-            container.innerHTML = "<p>Sorry, we couldn't load new arrivals at this time.</p>";
+            container.textContent = "Sorry, we couldn't load new arrivals at this time.";
         }
     }
 
